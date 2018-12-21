@@ -64,7 +64,7 @@ public class EmployeeDao extends JDBCUtil{
 				EmployeeEntity ee = new EmployeeEntity();
 				ee.setEmpId(rs.getInt("empid"));
 				ee.setEmpName(rs.getString("empname"));
-				ee.setEmpSex(rs.getString("empage"));
+				ee.setEmpSex(rs.getString("empsex"));
 				ee.setEmpAge(rs.getInt("empage"));
 				ee.setEmpBirthday(rs.getString("empbirthday"));
 				ee.setEmpBasic(rs.getFloat("empbasic"));
@@ -131,7 +131,7 @@ public class EmployeeDao extends JDBCUtil{
 			while(rs.next()){
 				ee.setEmpId(rs.getInt("empid"));
 				ee.setEmpName(rs.getString("empname"));
-				ee.setEmpSex(rs.getString("empage"));
+				ee.setEmpSex(rs.getString("empsex"));
 				ee.setEmpAge(rs.getInt("empage"));
 				ee.setEmpBirthday(rs.getString("empbirthday"));
 				ee.setEmpBasic(rs.getFloat("empbasic"));
@@ -179,8 +179,41 @@ public class EmployeeDao extends JDBCUtil{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			new EventDao().AddEventAfterAddEmp(GetMaxId());
 		}
 	}
+	
+	//查询员工最大id
+	public int GetMaxId() {
+		EmployeeEntity ee = new EmployeeEntity();
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int empid = 0;
+		String sql = "select max(empid) from employee";
+		try{
+			ps = con.prepareStatement(sql);
+			rs = ps.executeQuery();
+			if(rs.next()){
+				empid = rs.getInt("max(empid)");
+			}
+		}catch (Exception e){
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			try {
+				rs.close();
+				ps.close();
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return empid;
+	}
+	
+	
 	//删除员工信息
 	public void DeleteEmployee(int EmpId){
 		Connection con = getConnection();
@@ -202,5 +235,6 @@ public class EmployeeDao extends JDBCUtil{
 				e.printStackTrace();
 			}
 		}
+		new EventDao().DropEventEntityByempid(EmpId);
 	}
 }
